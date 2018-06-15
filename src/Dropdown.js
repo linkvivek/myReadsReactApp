@@ -3,11 +3,11 @@ import * as BooksAPI from './BooksAPI';
 
 class Dropdown extends Component {
 
-    render() {
+    render() { 
     return (
         <div className="book-shelf-changer">
-            <select onChange = {(e) => this.props.updateShelf(this.props.Book, e.target.value)}>
-                <option value="move" disabled selected>Move to...</option>
+            <select onChange = {(e) => this.props.updateShelf(this.props.Book, e.target.value)} defaultValue={this.props.Book.shelf}>
+                <option value="move" disabled>Move to...</option>
                 { this.props.shelf.map((s) => (
                 <option value= {s.id} >{ s.type }</option>
                 ))}
@@ -15,13 +15,7 @@ class Dropdown extends Component {
         </div>
 
     )
-
 }
-    // updateShelf(book, shelf) {
-    // alert(book)
-    // BooksAPI.update(book, shelf).then(() => this.fetchBooks())
-//   }
-
 
 }
 

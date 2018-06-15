@@ -1,43 +1,53 @@
 import React from 'react'
-
-
+import * as BooksAPI from './BooksAPI'
+import Shelf from './shelf'
 
 class Search extends React.Component {
 
     state = {
-        input : ''
+        searchData : []
       }    
 
-
       updateQuery = (value) => {
-        this.setState(() => ({
-          input :value
-        })
-      )}
-    render() {
+        if(value == '')
+          this.state.searchData = []
+        else {
+        BooksAPI.search(value).then((result) => {
+          if(result.hasOwnProperty('error')){
+            this.setState({
+              searchData: []
+            })
+          } else 
+          this.markBookStatus(result)
+        }
+      )}}
 
-        const {input} = this.state
-        const showingLists = this.state.query === ''? this.state.Books : 
-        this.props.Books.filter((c) => (c.title.toLowerCase().includes(this.state.input.toLowerCase())
-        // || c.authors.toLowerCase().includes(this.state.input.toLowerCase())
-    ))
+      markBookStatus(books) {
+        const localBooks = this.props.Books
+        console.log('///////')
+        console.log(books)
+        books.forEach(((book, index) => {
+          let foundBook = localBooks.find(b => b.id === book.id)
+          book.shelf = foundBook ? foundBook.shelf : 'none'
+          books[index] = book
+        }))
+    
+        this.setState({searchData: books})
+      }
+          
 
-        console.log('here')
-        console.log(this.props.Books)
+      render() {
+        console.log(this.state.searchData)
     
         return (
 
             <div className="search-books-input-wrapper">
-
-            <input type="text" placeholder="Search by title or author" value={this.state.input}
+            <input type="text" placeholder="Search by title or author" 
               onChange = {(e) => this.updateQuery(e.target.value)} ></input>
 
-            <ul class="list-group">
-            {showingLists.map((b) => (
-              <li class="list-group-item">{b.title}</li>
-            ))}
-            </ul>
-
+            {this.state.searchData.length>0 && (
+              <Shelf Books = {this.state.searchData} updateShelf = {this.props.updateShelf} />
+          )}
           </div>
         
         )
