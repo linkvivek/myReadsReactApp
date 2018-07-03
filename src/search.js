@@ -1,58 +1,29 @@
 import React from 'react'
-import * as BooksAPI from './BooksAPI'
+// import * as BooksAPI from './BooksAPI'
 import Shelf from './shelf'
+import {connect} from 'react-redux'
+import {markBookStatus} from './store/actionCreator'
+// import store from './store'
+// import {loadState} from './store/localStorage'
+// import {Link} from 'react-router-dom'; //setup back button
+
 
 class Search extends React.Component {
 
-    state = {
-        searchData : []
-      }    
-
-      updateQuery = (value) => {
-        if(value == '')
-          this.state.searchData = []
-        else {
-        BooksAPI.search(value).then((result) => {
-          if(result.hasOwnProperty('error')){
-            this.setState({
-              searchData: []
-            })
-          } else 
-          this.markBookStatus(result)
-        }
-      )}}
-
-      markBookStatus(books) {
-        const localBooks = this.props.Books
-        console.log('///////')
-        console.log(books)
-        books.forEach(((book, index) => {
-          let foundBook = localBooks.find(b => b.id === book.id)
-          book.shelf = foundBook ? foundBook.shelf : 'none'
-          books[index] = book
-        }))
-    
-        this.setState({searchData: books})
+      updateQuery = (query) => {
+        this.props.markBookStatus(query.trim())
       }
           
-
       render() {
-        console.log(this.state.searchData)
-    
         return (
-
             <div className="search-books-input-wrapper">
             <input type="text" placeholder="Search by title or author" 
               onChange = {(e) => this.updateQuery(e.target.value)} ></input>
-
-            {this.state.searchData.length>0 && (
-              <Shelf Books = {this.state.searchData} updateShelf = {this.props.updateShelf} />
-          )}
+              <Shelf updateShelf = {this.props.updateShelf} fromSearch = {true}/>
           </div>
-        
         )
     }
     }
+  
+    export default connect(null, {markBookStatus})(Search)
 
-
-    export default Search
